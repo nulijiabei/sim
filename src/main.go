@@ -20,7 +20,7 @@ var show = flag.Bool("show", false, "show phone book type")
 var read = flag.String("read", "", "NO 1")
 
 // 写入电话薄
-var write = flag.String("write", "", "NO 18600000000 Emergency")
+var write = flag.String("write", "", "NO 1 18600000000 Emergency")
 
 // 主
 func main() {
@@ -55,7 +55,22 @@ func main() {
 			log.Println(v)
 			return
 		} else {
-			log.Panic("parameter error ...")
+			log.Panic("parameter exception ...")
+		}
+	}
+
+	// 写入
+	if !z.IsBlank(*write) {
+		if cmd := strings.Fields(*write); len(cmd) == 4 {
+			Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBS=%s", cmd[0]))
+			v, e := Com("/dev/ttyUSB0", fmt.Sprint("AT+CPBW=%s,%s,128,%s)", cmd[1], cmd[2], cmd[3]))
+			if e != nil {
+				log.Panic(e)
+			}
+			log.Println(v)
+			return
+		} else {
+			log.Panic("parameter exception ...")
 		}
 	}
 
@@ -91,7 +106,7 @@ func Com(dev string, data string) ([]string, error) {
 		}
 		log.Println("->", line)
 		content = append(content, Trim(line))
-		if strings.Contains(line, "OK") {
+		if strings.Contains(line, "OK") || strings.Contains(line, "ERROR") {
 			break
 		}
 
