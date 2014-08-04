@@ -13,6 +13,9 @@ import (
 	"time"
 )
 
+// 设备
+var device = flag.String("dev", "", "device address")
+
 // 查看支持类型
 var show = flag.Bool("show", false, "show phone book type")
 
@@ -34,26 +37,29 @@ func main() {
 	// 设置日志的结构
 	log.SetFlags(log.Lshortfile | log.Ldate | log.Ltime | log.Lmicroseconds)
 
+	// 判断是否指定设备
+	if z.IsBlank(*device) {
+		log.Panic("not set device address")
+	}
+
 	// 查看支持电话簿
 	if *show {
-		v, e := Com("/dev/ttyUSB0", "AT+CPBS=?")
+		v, e := Com(*device, "AT+CPBS=?")
 		if e != nil {
 			log.Panic(e)
 		}
 		log.Println(v)
-		return
 	}
 
 	// 读取
 	if !z.IsBlank(*read) {
 		if cmd := strings.Fields(*read); len(cmd) == 2 {
-			Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBS=%s", cmd[0]))
-			v, e := Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBR=%s", cmd[1]))
+			Com(*device, fmt.Sprintf("AT+CPBS=%s", cmd[0]))
+			v, e := Com(*device, fmt.Sprintf("AT+CPBR=%s", cmd[1]))
 			if e != nil {
 				log.Panic(e)
 			}
 			log.Println(v)
-			return
 		} else {
 			log.Panic("parameter exception ...")
 		}
@@ -62,13 +68,12 @@ func main() {
 	// 写入
 	if !z.IsBlank(*write) {
 		if cmd := strings.Fields(*write); len(cmd) == 4 {
-			Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBS=%s", cmd[0]))
-			v, e := Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBW=%s,\"%s\",129,\"%s\")", cmd[1], cmd[2], cmd[3]))
+			Com(*device, fmt.Sprintf("AT+CPBS=%s", cmd[0]))
+			v, e := Com(*device, fmt.Sprintf("AT+CPBW=%s,\"%s\",129,\"%s\")", cmd[1], cmd[2], cmd[3]))
 			if e != nil {
 				log.Panic(e)
 			}
 			log.Println(v)
-			return
 		} else {
 			log.Panic("parameter exception ...")
 		}
@@ -104,6 +109,7 @@ func Com(dev string, data string) ([]string, error) {
 		if err != nil {
 			break
 		}
+		log.Println("->", line)
 		content = append(content, Trim(line))
 		if strings.Contains(line, "OK") || strings.Contains(line, "ERROR") {
 			break
