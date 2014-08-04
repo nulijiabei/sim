@@ -48,7 +48,7 @@ func main() {
 	if !z.IsBlank(*read) {
 		if cmd := strings.Fields(*read); len(cmd) == 2 {
 			Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBS=%s", cmd[0]))
-			v, e := Com("/dev/ttyUSB0", fmt.Sprint("AT+CPBR=%s", cmd[1]))
+			v, e := Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBR=%s", cmd[1]))
 			if e != nil {
 				log.Panic(e)
 			}
@@ -63,7 +63,7 @@ func main() {
 	if !z.IsBlank(*write) {
 		if cmd := strings.Fields(*write); len(cmd) == 4 {
 			Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBS=%s", cmd[0]))
-			v, e := Com("/dev/ttyUSB0", fmt.Sprint("AT+CPBW=%s,%s,128,%s)", cmd[1], cmd[2], cmd[3]))
+			v, e := Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBW=%s,%s,128,%s)", cmd[1], cmd[2], cmd[3]))
 			if e != nil {
 				log.Panic(e)
 			}
