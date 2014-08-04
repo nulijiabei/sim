@@ -17,10 +17,10 @@ import (
 var show = flag.Bool("show", false, "show phone book type")
 
 // 读取电话薄
-var read = flag.String("read", "", "NO 1")
+var read = flag.String("read", "", "ON 1")
 
 // 写入电话薄
-var write = flag.String("write", "", "NO 1 18600000000 Emergency")
+var write = flag.String("write", "", "ON 1 18600000000 Emergency")
 
 // 主
 func main() {
@@ -63,7 +63,7 @@ func main() {
 	if !z.IsBlank(*write) {
 		if cmd := strings.Fields(*write); len(cmd) == 4 {
 			Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBS=%s", cmd[0]))
-			v, e := Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBW=%s,%s,128,%s)", cmd[1], cmd[2], cmd[3]))
+			v, e := Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBW=%s,\"%s\",129,\"%s\")", cmd[1], cmd[2], cmd[3]))
 			if e != nil {
 				log.Panic(e)
 			}
@@ -104,7 +104,6 @@ func Com(dev string, data string) ([]string, error) {
 		if err != nil {
 			break
 		}
-		log.Println("->", line)
 		content = append(content, Trim(line))
 		if strings.Contains(line, "OK") || strings.Contains(line, "ERROR") {
 			break
