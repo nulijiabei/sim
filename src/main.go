@@ -2,17 +2,29 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	serial "github.com/tarm/goserial"
 	"io"
 	"log"
-	"os"
 	"runtime"
 	"strings"
 	"time"
 )
 
+// 查看支持类型
+var show = flag.Bool("show", false, "show phone book type")
+
+// 读取电话薄
+var read = flag.String("read", "", "NO 1")
+
+// 写入电话薄
+var write = flag.String("write", "", "NO 18600000000 Emergency")
+
 // 主
 func main() {
+
+	// 解析程序参数
+	flag.Parse()
 
 	// 设置CPU核心数量
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -20,10 +32,14 @@ func main() {
 	// 设置日志的结构
 	log.SetFlags(log.Lshortfile | log.Ldate | log.Ltime | log.Lmicroseconds)
 
-	v, e := Com(os.Args[1], "AT+CFUN=1,1")
-	if e != nil {
+	// 查看支持电话簿
+	if *show {
+		v, e := Com("/dev/ttyUSB0", "AT+CPBS=?")
+		if e != nil {
+			log.Panic(e)
+		}
+		log.Println(v)
 	}
-	log.Println(v)
 
 }
 
