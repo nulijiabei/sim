@@ -71,6 +71,7 @@ func Com(dev string, data string) ([]string, error) {
 		if err != nil {
 			break
 		}
+		log.Println("->", line)
 		content = append(content, Trim(line))
 		if strings.Contains(line, "OK") {
 			break
