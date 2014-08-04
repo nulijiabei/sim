@@ -3,8 +3,9 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
+	z "github.com/nutzam/zgo"
 	serial "github.com/tarm/goserial"
-		z "github.com/nutzam/zgo"
 	"io"
 	"log"
 	"runtime"
@@ -40,10 +41,23 @@ func main() {
 			log.Panic(e)
 		}
 		log.Println(v)
+		return
 	}
-	
-	// 读取电话薄
-	if IsSpace()
+
+	// 读取
+	if !z.IsBlank(*read) {
+		if cmd := strings.Fields(*read); len(cmd) == 2 {
+			Com("/dev/ttyUSB0", fmt.Sprintf("AT+CPBS=%s", cmd[0]))
+			v, e := Com("/dev/ttyUSB0", fmt.Sprint("AT+CPBR=%s", cmd[1]))
+			if e != nil {
+				log.Panic(e)
+			}
+			log.Println(v)
+			return
+		} else {
+			log.Panic("parameter error ...")
+		}
+	}
 
 }
 
