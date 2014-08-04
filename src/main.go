@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	serial "github.com/tarm/goserial"
+		z "github.com/nutzam/zgo"
 	"io"
 	"log"
 	"runtime"
@@ -40,6 +41,9 @@ func main() {
 		}
 		log.Println(v)
 	}
+	
+	// 读取电话薄
+	if IsSpace()
 
 }
 
