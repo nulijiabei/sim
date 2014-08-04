@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	z "github.com/nutzam/zgo"
 	serial "github.com/tarm/goserial"
 	"io"
 	"log"
@@ -38,7 +37,7 @@ func main() {
 	log.SetFlags(log.Lshortfile | log.Ldate | log.Ltime | log.Lmicroseconds)
 
 	// 判断是否指定设备
-	if z.IsBlank(*device) {
+	if IsBlank(*device) {
 		log.Panic("not set device address")
 	}
 
@@ -52,7 +51,7 @@ func main() {
 	}
 
 	// 读取
-	if !z.IsBlank(*read) {
+	if !IsBlank(*read) {
 		if cmd := strings.Fields(*read); len(cmd) == 2 {
 			Com(*device, fmt.Sprintf("AT+CPBS=%s", cmd[0]))
 			v, e := Com(*device, fmt.Sprintf("AT+CPBR=%s", cmd[1]))
@@ -66,7 +65,7 @@ func main() {
 	}
 
 	// 写入
-	if !z.IsBlank(*write) {
+	if !IsBlank(*write) {
 		if cmd := strings.Fields(*write); len(cmd) == 4 {
 			Com(*device, fmt.Sprintf("AT+CPBS=%s", cmd[0]))
 			v, e := Com(*device, fmt.Sprintf("AT+CPBW=%s,\"%s\",129,\"%s\")", cmd[1], cmd[2], cmd[3]))
@@ -150,4 +149,15 @@ func IsSpace(c byte) bool {
 		return true
 	}
 	return false
+}
+
+// 判断一个字符串是不是空白串，即（0x00 - 0x20 之内的字符均为空白字符）
+func IsBlank(s string) bool {
+	for i := 0; i < len(s); i++ {
+		b := s[i]
+		if !IsSpace(b) {
+			return false
+		}
+	}
+	return true
 }
