@@ -83,7 +83,7 @@ func main() {
 	if !IsBlank(*write) {
 		if cmd := strings.Fields(*write); len(cmd) == 4 {
 			Com(*device, fmt.Sprintf("AT+CPBS=%s", cmd[0]))
-			Com(*device, fmt.Sprintf("AT+CPBW=%s", cmd[0]))
+			Com(*device, fmt.Sprintf("AT+CPBW=%s", cmd[1]))
 			v, e := Com(*device, fmt.Sprintf("AT+CPBW=%s,\"+86%s\",129,\"\")", cmd[1], cmd[2]))
 			if e != nil {
 				log.Panic(e)
