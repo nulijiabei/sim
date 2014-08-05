@@ -6,7 +6,11 @@ import (
 	"fmt"
 	serial "github.com/tarm/goserial"
 	"io"
+	"io/ioutil"
 	"log"
+	//"net"
+	"net/http"
+	"net/url"
 	"runtime"
 	"strings"
 	"time"
@@ -26,6 +30,11 @@ var write = flag.String("write", "", "ON 1 18600000000 Emergency")
 
 // 主
 func main() {
+
+	num, e := ICCID("8986011181100824297")
+	log.Println(e, num)
+
+	return
 
 	// 解析程序参数
 	flag.Parse()
@@ -78,6 +87,41 @@ func main() {
 		}
 	}
 
+}
+
+// ICCID
+func ICCID(iccid string) (string, error) {
+	// 上传数据
+	resp, e := http.PostForm("http://iservice.10010.com/ehallService/helpCenter/wireless/execute",
+		url.Values{
+			"iccid":    {iccid},
+			"proId":    {"011"},
+			"backData": {"noname"},
+			"callBack": {"wirelessCard.processData"}})
+	if e != nil {
+		// 返回空
+		return "", e
+	}
+	// 保证I/O正常关闭
+	defer resp.Body.Close()
+	log.Println(resp.StatusCode, http.StatusOK)
+	// 判断返回状态
+	if resp.StatusCode == http.StatusOK {
+		// 读取返回的数据
+		data, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			// 读取异常,返回错误
+			return "", err
+		}
+		index := strings.Index(string(data), "userNumber")
+		num := string(data[index+13 : index+13+11])
+		if len(num) == 11 && strings.HasPrefix(num, "1") {
+			return num, nil
+		} else {
+			return "", nil
+		}
+	}
+	return "", nil
 }
 
 // Com 接口
