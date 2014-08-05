@@ -34,6 +34,10 @@ var auto = flag.Bool("auto", false, "auto write ...")
 // 主
 func main() {
 
+	ICCID()
+
+	return
+
 	// 解析程序参数
 	flag.Parse()
 
@@ -94,6 +98,16 @@ func main() {
 		}
 	}
 
+}
+
+// ICCID
+func ICCID() (string, error) {
+	v, e := Com(*device, "AT+CRSM=176,12258,0,0,10")
+	if e != nil {
+		return "", e
+	}
+	log.Println(v)
+	return "", nil
 }
 
 // TEL
