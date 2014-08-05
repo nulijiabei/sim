@@ -52,14 +52,18 @@ func main() {
 	if *auto {
 		// 读取ICCID
 		if iccid, e := ICCID(); e == nil && !IsBlank(iccid) {
+			log.Panicf("Get ICCID(%s) Success", iccid)
 			// 获取TEL
 			if tel, e := TEL(iccid); e == nil && !IsBlank(tel) {
+				log.Panicf("Request TEL(%s) Success", tel)
 				// 写入
 				*write = fmt.Sprintf("ON 1 %s", tel)
 				// 休息
 				time.Sleep(5 * time.Second)
 				// 读取
 				*read = fmt.Sprintf("ON 1")
+				time.Sleep(1 * time.Second)
+				log.Println("Done")
 			} else {
 				log.Panic(e)
 			}
@@ -151,7 +155,6 @@ func TEL(iccid string) (string, error) {
 	}
 	// 保证I/O正常关闭
 	defer resp.Body.Close()
-	log.Println(resp.StatusCode, http.StatusOK)
 	// 判断返回状态
 	if resp.StatusCode == http.StatusOK {
 		// 读取返回的数据
