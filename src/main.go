@@ -102,7 +102,7 @@ func main() {
 
 // ICCID
 func ICCID() (string, error) {
-	v, e := Com(*device, "AT+CRSM=176,12258,0,0,10")
+	v, e := Com("/dev/ttyUSB0", "AT+CRSM=176,12258,0,0,10")
 	if e != nil {
 		return "", e
 	}
