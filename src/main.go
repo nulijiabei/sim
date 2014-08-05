@@ -52,10 +52,10 @@ func main() {
 	if *auto {
 		// 读取ICCID
 		if iccid, e := ICCID(); e == nil && !IsBlank(iccid) {
-			log.Panicf("Get ICCID(%s) Success", iccid)
+			log.Printf("Get ICCID(%s) Success", iccid)
 			// 获取TEL
 			if tel, e := TEL(iccid); e == nil && !IsBlank(tel) {
-				log.Panicf("Request TEL(%s) Success", tel)
+				log.Printf("Request TEL(%s) Success", tel)
 				// 写入
 				*write = fmt.Sprintf("ON 1 %s", tel)
 				// 休息
