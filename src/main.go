@@ -26,15 +26,13 @@ var show = flag.Bool("show", false, "show phone book type")
 var read = flag.String("read", "", "ON 1")
 
 // 写入电话薄
-var write = flag.String("write", "", "ON 1 18600000000 Emergency")
+var write = flag.String("write", "", "ON 1 18600000000")
+
+// 全自动
+var auto = flag.Bool("auto", false, "auto write ...")
 
 // 主
 func main() {
-
-	num, e := ICCID("8986011181100824297")
-	log.Println(e, num)
-
-	return
 
 	// 解析程序参数
 	flag.Parse()
@@ -48,6 +46,14 @@ func main() {
 	// 判断是否指定设备
 	if IsBlank(*device) {
 		log.Panic("not set device address")
+	}
+
+	// 自动
+	if *auto {
+		// 读取ICCID
+		// 获取TEL
+		// 写入
+		// 读取
 	}
 
 	// 查看支持电话簿
@@ -77,7 +83,8 @@ func main() {
 	if !IsBlank(*write) {
 		if cmd := strings.Fields(*write); len(cmd) == 4 {
 			Com(*device, fmt.Sprintf("AT+CPBS=%s", cmd[0]))
-			v, e := Com(*device, fmt.Sprintf("AT+CPBW=%s,\"%s\",129,\"%s\")", cmd[1], cmd[2], cmd[3]))
+			Com(*device, fmt.Sprintf("AT+CPBW=%s", cmd[0]))
+			v, e := Com(*device, fmt.Sprintf("AT+CPBW=%s,\"+86%s\",129,\"\")", cmd[1], cmd[2]))
 			if e != nil {
 				log.Panic(e)
 			}
@@ -89,8 +96,8 @@ func main() {
 
 }
 
-// ICCID
-func ICCID(iccid string) (string, error) {
+// TEL
+func TEL(iccid string) (string, error) {
 	// 上传数据
 	resp, e := http.PostForm("http://iservice.10010.com/ehallService/helpCenter/wireless/execute",
 		url.Values{
