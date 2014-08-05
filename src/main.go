@@ -51,10 +51,10 @@ func main() {
 	// 自动
 	if *auto {
 		// 读取ICCID
-		if iccid, e := ICCID(); e == nil && !IsBlank(iccid) {
-			log.Printf("Get ICCID(%s) Success", iccid)
+		if iccid, e := ICCID(); e == nil && !IsBlank(Trim(iccid)) {
+			log.Printf("Get ICCID(%s) Success", Trim(iccid))
 			// 获取TEL
-			if tel, e := TEL(iccid); e == nil && !IsBlank(tel) {
+			if tel, e := TEL(Trim(iccid)); e == nil && !IsBlank(tel) {
 				log.Printf("Request TEL(%s) Success", tel)
 				// 写入
 				*write = fmt.Sprintf("ON 1 %s", tel)
@@ -62,8 +62,8 @@ func main() {
 				time.Sleep(5 * time.Second)
 				// 读取
 				*read = fmt.Sprintf("ON 1")
+				// 休息
 				time.Sleep(1 * time.Second)
-				log.Println("Done")
 			} else {
 				log.Panic(e)
 			}
@@ -81,11 +81,12 @@ func main() {
 		log.Println(v)
 	}
 
-	// 读取
-	if !IsBlank(*read) {
-		if cmd := strings.Fields(*read); len(cmd) == 2 {
+	// 写入
+	if !IsBlank(*write) {
+		if cmd := strings.Fields(*write); len(cmd) == 3 {
 			Com(*device, fmt.Sprintf("AT+CPBS=%s", cmd[0]))
-			v, e := Com(*device, fmt.Sprintf("AT+CPBR=%s", cmd[1]))
+			Com(*device, fmt.Sprintf("AT+CPBW=%s", cmd[1]))
+			v, e := Com(*device, fmt.Sprintf("AT+CPBW=%s,\"+86%s\",129,\"\")", cmd[1], cmd[2]))
 			if e != nil {
 				log.Panic(e)
 			}
@@ -95,12 +96,11 @@ func main() {
 		}
 	}
 
-	// 写入
-	if !IsBlank(*write) {
-		if cmd := strings.Fields(*write); len(cmd) == 3 {
+	// 读取
+	if !IsBlank(*read) {
+		if cmd := strings.Fields(*read); len(cmd) == 2 {
 			Com(*device, fmt.Sprintf("AT+CPBS=%s", cmd[0]))
-			Com(*device, fmt.Sprintf("AT+CPBW=%s", cmd[1]))
-			v, e := Com(*device, fmt.Sprintf("AT+CPBW=%s,\"+86%s\",129,\"\")", cmd[1], cmd[2]))
+			v, e := Com(*device, fmt.Sprintf("AT+CPBR=%s", cmd[1]))
 			if e != nil {
 				log.Panic(e)
 			}
