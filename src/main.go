@@ -34,10 +34,6 @@ var auto = flag.Bool("auto", false, "auto write ...")
 // 主
 func main() {
 
-	ICCID()
-
-	return
-
 	// 解析程序参数
 	flag.Parse()
 
@@ -55,9 +51,21 @@ func main() {
 	// 自动
 	if *auto {
 		// 读取ICCID
-		// 获取TEL
-		// 写入
-		// 读取
+		if iccid, e := ICCID(); e == nil && !IsBlank(iccid) {
+			// 获取TEL
+			if tel, e := TEL(iccid); e == nil && !IsBlank(tel) {
+				// 写入
+				*write = fmt.Sprintf("ON 1 %s", tel)
+				// 休息
+				time.Sleep(5 * time.Second)
+				// 读取
+				*read = fmt.Sprintf("ON 1")
+			} else {
+				log.Panic(e)
+			}
+		} else {
+			log.Panic(e)
+		}
 	}
 
 	// 查看支持电话簿
@@ -102,11 +110,29 @@ func main() {
 
 // ICCID
 func ICCID() (string, error) {
-	v, e := Com("/dev/ttyUSB0", "AT+CRSM=176,12258,0,0,10")
+	v, e := Com(*device, "AT+CRSM=176,12258,0,0,10")
 	if e != nil {
 		return "", e
 	}
-	log.Println(v)
+	for _, line := range v {
+		if strings.HasPrefix(Trim(line), "+CRSM:") {
+			s := strings.Split(Trim(line), ",")
+			id := strings.Trim(Trim(s[2]), "\"")
+			if len(id) == 20 {
+				return fmt.Sprintf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n",
+					(id[1]), (id[0]),
+					(id[3]), (id[2]),
+					(id[5]), (id[4]),
+					(id[7]), (id[6]),
+					(id[9]), (id[8]),
+					(id[11]), (id[10]),
+					(id[13]), (id[12]),
+					(id[15]), (id[14]),
+					(id[17]), (id[16]),
+					(id[19])), nil
+			}
+		}
+	}
 	return "", nil
 }
 
