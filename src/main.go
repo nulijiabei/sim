@@ -48,6 +48,11 @@ func main() {
 		log.Panic("not set device address")
 	}
 
+	v, e := Com(*device, "AT+CRSM=176,12258,0,0,10")
+	log.Println(v, e)
+
+	return
+
 	// 自动
 	if *auto {
 		// 读取ICCID
@@ -172,6 +177,45 @@ func TEL(iccid string) (string, error) {
 		}
 	}
 	return "", nil
+}
+
+// Com 接口
+func Com1(dev string, data string) (string, error) {
+
+	c := &serial.Config{Name: dev, Baud: 115200}
+	s, e := serial.OpenPort(c)
+	if e != nil {
+		return "", e
+	}
+	defer s.Close()
+
+	wd := bufio.NewWriter(s)
+	wd.Write([]byte(data + "\r\n"))
+	wd.Flush()
+
+	time.Sleep(1 * time.Second)
+
+	content := make([]byte, 0)
+
+	i := 0
+
+	rd := bufio.NewReader(s)
+	for {
+
+		if bt, err := rd.ReadByte(); err == nil {
+			if bt == '\n' && content[i-1] == '\r' {
+				return string(content), nil
+			}
+			content[i] = bt
+			i++
+		} else {
+			break
+		}
+
+	}
+
+	return "", nil
+
 }
 
 // Com 接口
