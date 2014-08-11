@@ -48,8 +48,11 @@ func main() {
 		log.Panic("not set device address")
 	}
 
-	v, e := Com(*device, "AT+CRSM=176,12258,0,0,10")
-	log.Println(v, e)
+	v, e := Com1(*device, "AT+CRSM=176,12258,0,0,10")
+	log.Println(e)
+	for v, _ := range strings.Fields(v) {
+		log.Println(v)
+	}
 
 	return
 
