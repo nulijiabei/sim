@@ -198,7 +198,7 @@ func Com1(dev string, data string) (string, error) {
 
 	time.Sleep(1 * time.Second)
 
-	content := make([]byte, 0)
+	content := make([]byte, 0, 512)
 
 	i := 0
 
