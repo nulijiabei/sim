@@ -1,3 +1,7 @@
+---------------
+Sim
+
+[![GoDoc](https://godoc.org/github.com/nulijiabei/sim?status.svg)](https://godoc.org/github.com/nulijiabei/sim)
 
 暂时设计支持自动写入本机号,但是框架支持任意电话薄,任意内容
 
